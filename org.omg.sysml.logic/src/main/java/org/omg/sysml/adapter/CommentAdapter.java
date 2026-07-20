@@ -19,7 +19,6 @@
 package org.omg.sysml.adapter;
 
 import org.omg.sysml.lang.sysml.Comment;
-import org.omg.sysml.util.ElementUtil;
 
 public class CommentAdapter extends AnnotatingElementAdapter {
 	
@@ -35,8 +34,6 @@ public class CommentAdapter extends AnnotatingElementAdapter {
 	@Override
 	public void postProcess() {
 		super.postProcess();
-		Comment target = getTarget();
-		target.setLocale(ElementUtil.unescapeString(target.getLocale()));
-		target.setBody(ElementUtil.processCommentBody(target.getBody()));
+		getLexicalNormalizationService().caseComment(getTarget());
 	}
 }

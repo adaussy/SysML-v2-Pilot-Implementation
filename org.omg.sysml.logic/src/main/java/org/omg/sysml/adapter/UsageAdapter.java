@@ -34,8 +34,8 @@ import org.omg.sysml.lang.sysml.Subsetting;
 import org.omg.sysml.lang.sysml.SysMLPackage;
 import org.omg.sysml.lang.sysml.Type;
 import org.omg.sysml.lang.sysml.Usage;
-import org.omg.sysml.util.SysMLLibraryUtil;
 import org.omg.sysml.util.FeatureUtil;
+import org.omg.sysml.util.SysMLLibraryUtil;
 import org.omg.sysml.util.TypeUtil;
 import org.omg.sysml.util.UsageUtil;
 
@@ -58,13 +58,7 @@ public class UsageAdapter extends FeatureAdapter {
 	@Override
 	public void postProcess () {
 		super.postProcess();
-		Usage target = getTarget();
-		if (target.isVariation()) {
-			target.setIsAbstract(true);
-		}
-		if (target.getDirection() != null || target.isEnd() || !UsageUtil.hasFeaturingType(target)) {
-			target.setIsComposite(false);
-		}
+		getStructuralModelCompletionService().caseUsage(getTarget());
 	}
 	
 	@Override

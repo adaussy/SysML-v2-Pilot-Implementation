@@ -36,10 +36,7 @@ public class DefinitionAdapter extends ClassifierAdapter {
 	@Override
 	public void postProcess() {
 		super.postProcess();
-		Definition target = getTarget();
-		if (target.isVariation()) {
-			target.setIsAbstract(true);
-		}
+		getStructuralModelCompletionService().caseDefinition(getTarget());
 	}
 	
 }

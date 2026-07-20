@@ -21,7 +21,6 @@
 package org.omg.sysml.adapter;
 
 import org.omg.sysml.lang.sysml.EndFeatureMembership;
-import org.omg.sysml.lang.sysml.Feature;
 
 public class EndFeatureMembershipAdapter extends FeatureMembershipAdapter {
 
@@ -40,11 +39,7 @@ public class EndFeatureMembershipAdapter extends FeatureMembershipAdapter {
 	@Override
 	public void postProcess() {
 		super.postProcess();
-		EndFeatureMembership target = getTarget();
-		Feature endFeature = target.getOwnedMemberFeature();
-		if (endFeature != null) {
-			endFeature.setIsEnd(true);
-		}
+		getStructuralModelCompletionService().caseEndFeatureMembership(getTarget());
 	}
 
 }

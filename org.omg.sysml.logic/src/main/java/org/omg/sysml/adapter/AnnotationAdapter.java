@@ -21,10 +21,7 @@
 
 package org.omg.sysml.adapter;
 
-import org.omg.sysml.lang.sysml.AnnotatingElement;
 import org.omg.sysml.lang.sysml.Annotation;
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.SysMLPackage;
 
 public class AnnotationAdapter extends RelationshipAdapter {
 
@@ -39,16 +36,7 @@ public class AnnotationAdapter extends RelationshipAdapter {
 	
 	@Override
 	public void postProcess() {
-		Annotation obj = getTarget();
-		
-		// If the Annotation is not owned by an AnnotatingElement, then the annotatedElement is the owningRelatedElement.
-		Object annotatedElement = obj.eGet(SysMLPackage.Literals.ANNOTATION__ANNOTATED_ELEMENT, false);
-		if (annotatedElement == null) {
-			Element owningRelatedElement = obj.getOwningRelatedElement();
-			if (!(owningRelatedElement instanceof AnnotatingElement)) {
-				obj.setAnnotatedElement(owningRelatedElement);
-			}
-		}
+		getStructuralModelCompletionService().caseAnnotation(getTarget());
 	}
 	
 }

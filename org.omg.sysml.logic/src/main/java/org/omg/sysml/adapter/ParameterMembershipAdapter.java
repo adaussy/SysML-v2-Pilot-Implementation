@@ -20,7 +20,6 @@
 
 package org.omg.sysml.adapter;
 
-import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.ParameterMembership;
 
 public class ParameterMembershipAdapter extends FeatureMembershipAdapter {
@@ -37,11 +36,7 @@ public class ParameterMembershipAdapter extends FeatureMembershipAdapter {
 	@Override
 	public void postProcess() {
 		super.postProcess();
-		ParameterMembership target = getTarget();
-		Feature parameter = target.getOwnedMemberParameter();
-		if (parameter != null) {
-			parameter.setDirection(target.parameterDirection());
-		}
+		getStructuralModelCompletionService().caseParameterMembership(getTarget());
 	}
 
 }

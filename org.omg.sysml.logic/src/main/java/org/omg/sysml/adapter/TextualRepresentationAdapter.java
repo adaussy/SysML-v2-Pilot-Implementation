@@ -19,7 +19,6 @@
 package org.omg.sysml.adapter;
 
 import org.omg.sysml.lang.sysml.TextualRepresentation;
-import org.omg.sysml.util.ElementUtil;
 
 public class TextualRepresentationAdapter extends AnnotatingElementAdapter {
 	
@@ -35,8 +34,6 @@ public class TextualRepresentationAdapter extends AnnotatingElementAdapter {
 	@Override
 	public void postProcess() {
 		super.postProcess();
-		TextualRepresentation target = getTarget();
-		target.setLanguage(ElementUtil.unescapeString(target.getLanguage()));
-		target.setBody(ElementUtil.processCommentBody(target.getBody()));
+		getLexicalNormalizationService().caseTextualRepresentation(getTarget());
 	}
 }

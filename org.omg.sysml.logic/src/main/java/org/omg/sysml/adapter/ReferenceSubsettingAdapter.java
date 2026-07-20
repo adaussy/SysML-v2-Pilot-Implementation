@@ -21,11 +21,7 @@
 
 package org.omg.sysml.adapter;
 
-import org.eclipse.emf.common.util.EList;
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.ReferenceSubsetting;
-import org.omg.sysml.lang.sysml.SysMLPackage;
 
 public class ReferenceSubsettingAdapter extends SubsettingAdapter {
 
@@ -40,17 +36,7 @@ public class ReferenceSubsettingAdapter extends SubsettingAdapter {
 	
 	@Override
 	public void postProcess() {
-		ReferenceSubsetting obj = getTarget();
-		
-		// If the referencedFeature is empty, then set it to the last ownedRelatedElement
-		// (which will be a Feature chain).
-		Object referencedFeature = obj.eGet(SysMLPackage.Literals.REFERENCE_SUBSETTING__REFERENCED_FEATURE, false);
-		if (referencedFeature == null) {
-			EList<Element> ownedRelatedElements = obj.getOwnedRelatedElement();
-			if (!ownedRelatedElements.isEmpty()) {
-				obj.setReferencedFeature((Feature)ownedRelatedElements.get(ownedRelatedElements.size() - 1));
-			}
-		}
+		getStructuralModelCompletionService().caseReferenceSubsetting(getTarget());
 	}
 	
 }

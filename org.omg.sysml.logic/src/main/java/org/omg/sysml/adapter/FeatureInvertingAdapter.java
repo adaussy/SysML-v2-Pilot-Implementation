@@ -21,11 +21,7 @@
 
 package org.omg.sysml.adapter;
 
-import org.eclipse.emf.common.util.EList;
 import org.omg.sysml.lang.sysml.FeatureInverting;
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Feature;
-import org.omg.sysml.lang.sysml.SysMLPackage;
 
 public class FeatureInvertingAdapter extends RelationshipAdapter {
 
@@ -40,36 +36,7 @@ public class FeatureInvertingAdapter extends RelationshipAdapter {
 	
 	@Override
 	public void postProcess() {
-		FeatureInverting obj = getTarget();
-		
-		// If the featureInverted is empty, then set it to the owningRelatedElement of the FeatureInverting,
-		// if that is a Feature, otherwise set it to the first ownedRelatedElement (which will be a
-		// Feature chain).
-		Object featureInverted = obj.eGet(SysMLPackage.Literals.FEATURE_INVERTING__FEATURE_INVERTED, false);
-		if (featureInverted == null) {
-			Element owner = obj.getOwningRelatedElement();
-			if (owner instanceof Feature) {
-				// Handle FeatureInverting owned by the featureInverted.
-				obj.setFeatureInverted((Feature)owner);
-			} else {
-				// Handle featureInverted that is a Feature chain.
-				EList<Element> ownedRelatedElements = obj.getOwnedRelatedElement();
-				if (!ownedRelatedElements.isEmpty()) {
-					obj.setFeatureInverted((Feature)ownedRelatedElements.get(0));
-				}
-			}
-		}
-		
-		// If the invertingFeature is empty, then set it to the last ownedRelatedElement
-		// (which will be a Feature chain).
-		Object invertingFeature = obj.eGet(SysMLPackage.Literals.FEATURE_INVERTING__INVERTING_FEATURE, false);
-		if (invertingFeature == null) {
-			// Handle invertingFeature that is a Feature chain.
-			EList<Element> ownedRelatedElements = obj.getOwnedRelatedElement();
-			if (!ownedRelatedElements.isEmpty()) {
-				obj.setInvertingFeature((Feature)ownedRelatedElements.get(ownedRelatedElements.size() - 1));
-			}
-		}
+		getStructuralModelCompletionService().caseFeatureInverting(getTarget());
 	}
 	
 }

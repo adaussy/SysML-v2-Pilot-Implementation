@@ -30,9 +30,14 @@ import org.omg.sysml.lang.sysml.MetadataFeature;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.SysMLFactory;
 import org.omg.sysml.lang.sysml.Type;
+import org.omg.sysml.logic.LexicalNormalizationService;
+import org.omg.sysml.logic.StructuralModelCompletionService;
 import org.omg.sysml.util.ElementUtil;
 
 public class ElementAdapter extends AdapterImpl {
+
+	private final StructuralModelCompletionService structuralModelCompletionService = new StructuralModelCompletionService();
+	private final LexicalNormalizationService lexicalNormalizationService = new LexicalNormalizationService();
 	
 	protected Class<?> kind;
 	protected boolean isTransformed = false;
@@ -111,9 +116,15 @@ public class ElementAdapter extends AdapterImpl {
 	// Parse post-processing
 	
 	public void postProcess() {
-		Element target = getTarget();
-		target.setDeclaredName(ElementUtil.unescapeString(target.getDeclaredName()));
-		target.setDeclaredShortName(ElementUtil.unescapeString(target.getDeclaredShortName()));
+		getLexicalNormalizationService().caseElement(getTarget());
+	}
+
+	protected StructuralModelCompletionService getStructuralModelCompletionService() {
+		return structuralModelCompletionService;
+	}
+
+	protected LexicalNormalizationService getLexicalNormalizationService() {
+		return lexicalNormalizationService;
 	}
 	
 	// Transformation

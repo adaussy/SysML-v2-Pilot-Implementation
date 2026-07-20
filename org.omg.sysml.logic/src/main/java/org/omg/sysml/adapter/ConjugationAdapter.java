@@ -21,11 +21,7 @@
 
 package org.omg.sysml.adapter;
 
-import org.eclipse.emf.common.util.EList;
 import org.omg.sysml.lang.sysml.Conjugation;
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.SysMLPackage;
-import org.omg.sysml.lang.sysml.Type;
 
 public class ConjugationAdapter extends RelationshipAdapter {
 
@@ -40,31 +36,7 @@ public class ConjugationAdapter extends RelationshipAdapter {
 	
 	@Override
 	public void postProcess() {
-		Conjugation obj = getTarget();
-		
-		// If the conjugatedType is not set, then set it to the owningRelatedElement, if this is a Type,
-		// otherwise set it to the first ownedRelatedElement.
-		Object conjugatedType = obj.eGet(SysMLPackage.Literals.CONJUGATION__CONJUGATED_TYPE, false);
-		if (conjugatedType == null) {
-			Element owner = obj.getOwningRelatedElement();
-			if (owner instanceof Type) {
-				obj.setConjugatedType((Type)owner);
-			} else {
-				EList<Element> ownedRelatedElements = obj.getOwnedRelatedElement();
-				if (!ownedRelatedElements.isEmpty()) {
-					obj.setConjugatedType((Type)ownedRelatedElements.get(0));
-				}
-			}
-		}
-		
-		// If the originalType is not set, set it to the last ownedRelatedElement.
-		Object originalType = obj.eGet(SysMLPackage.Literals.CONJUGATION__ORIGINAL_TYPE, false);
-		if (originalType == null) {
-			EList<Element> ownedRelatedElements = obj.getOwnedRelatedElement();
-			if (!ownedRelatedElements.isEmpty()) {
-				obj.setOriginalType((Type)ownedRelatedElements.get(ownedRelatedElements.size() - 1));
-			}
-		}
+		getStructuralModelCompletionService().caseConjugation(getTarget());
 	}
 	
 }

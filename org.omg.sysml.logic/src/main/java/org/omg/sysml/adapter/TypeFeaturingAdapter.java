@@ -21,10 +21,7 @@
 
 package org.omg.sysml.adapter;
 
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.TypeFeaturing;
-import org.omg.sysml.lang.sysml.SysMLPackage;
 
 public class TypeFeaturingAdapter extends RelationshipAdapter {
 
@@ -39,16 +36,7 @@ public class TypeFeaturingAdapter extends RelationshipAdapter {
 	
 	@Override
 	public void postProcess() {
-		TypeFeaturing obj = getTarget();
-		
-		// If the featureOfType is empty, then set it to the owningRelatedElement (if this is a Feature).
-		Object featureOfType = obj.eGet(SysMLPackage.Literals.TYPE_FEATURING__FEATURE_OF_TYPE, false);
-		if (featureOfType == null) {
-			Element owner = obj.getOwningRelatedElement();
-			if (owner instanceof Feature) {
-				obj.setFeatureOfType((Feature)owner);
-			}
-		}
+		getStructuralModelCompletionService().caseTypeFeaturing(getTarget());
 	}
 	
 }

@@ -85,10 +85,7 @@ public class FeatureAdapter extends TypeAdapter {
 	
 	// Note: Can be individually overridden.
 	protected void setIsVariableIfConstant() {
-		Feature target = getTarget();
-		if (target.isConstant()) {
-			target.setIsVariable(true);
-		}		
+		getStructuralModelCompletionService().caseFeature(getTarget());
 	}
 	
 	// Caching

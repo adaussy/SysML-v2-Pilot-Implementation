@@ -21,11 +21,7 @@
 
 package org.omg.sysml.adapter;
 
-import org.eclipse.emf.common.util.EList;
 import org.omg.sysml.lang.sysml.Intersecting;
-import org.omg.sysml.lang.sysml.Element;
-import org.omg.sysml.lang.sysml.Feature;
-import org.omg.sysml.lang.sysml.SysMLPackage;
 
 public class IntersectingAdapter extends RelationshipAdapter {
 
@@ -40,19 +36,7 @@ public class IntersectingAdapter extends RelationshipAdapter {
 	
 	@Override
 	public void postProcess() {
-		Intersecting obj = getTarget();
-		
-		// If a Intersecting is parsed targeting a Feature chain, then the intersectingType will be empty,
-		// but the Intersecting will own the intersectingType. So, in this case, the intersectingType should
-		// be set to the (last) ownedRelatedelement.
-		Object intersectingType = obj.eGet(SysMLPackage.Literals.INTERSECTING__INTERSECTING_TYPE, false);
-		if (intersectingType == null) {
-			// Handle a intersectingType that is a Feature chain.
-			EList<Element> ownedRelatedElements = obj.getOwnedRelatedElement();
-			if (!ownedRelatedElements.isEmpty()) {
-				obj.setIntersectingType((Feature)ownedRelatedElements.get(ownedRelatedElements.size() - 1));
-			}
-		}
+		getStructuralModelCompletionService().caseIntersecting(getTarget());
 	}
 	
 }

@@ -21,7 +21,6 @@
 package org.omg.sysml.adapter;
 
 import org.omg.sysml.lang.sysml.LiteralString;
-import org.omg.sysml.util.ElementUtil;
 
 public class LiteralStringAdapter extends ExpressionAdapter {
 
@@ -37,8 +36,7 @@ public class LiteralStringAdapter extends ExpressionAdapter {
 	@Override
 	public void postProcess() {
 		super.postProcess();
-		LiteralString target = getTarget();
-		target.setValue(ElementUtil.unescapeString(target.getValue()));
+		getLexicalNormalizationService().caseLiteralString(getTarget());
 	}
 	
 }

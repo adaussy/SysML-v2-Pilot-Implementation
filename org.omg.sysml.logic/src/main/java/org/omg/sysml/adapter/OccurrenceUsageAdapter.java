@@ -39,11 +39,7 @@ public class OccurrenceUsageAdapter extends UsageAdapter {
 	@Override
 	public void postProcess() {
 		super.postProcess();
-		
-		OccurrenceUsage self = getTarget();
-		if (self.getPortionKind() != null) {
-			self.setIsPortion(true);
-		}
+		getStructuralModelCompletionService().caseOccurrenceUsage(getTarget());
 	}
 	
 	// Implicit Generalization
