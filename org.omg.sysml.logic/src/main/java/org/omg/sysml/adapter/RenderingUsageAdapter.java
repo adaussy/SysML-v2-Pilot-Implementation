@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021, 2023 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -34,52 +35,9 @@ public class RenderingUsageAdapter extends PartUsageAdapter {
 		super(element);
 	}
 	
-	/**
-	 * @satisfies checkPartUsageSubpartSpecialization
-	 */
-	@Override
-	public void addDefaultGeneralType() {
-		super.addDefaultGeneralType();
-		if (isSubitem()) {
-			addDefaultGeneralType("subpart");
-		}
-	}
-	
 	@Override
 	public RenderingUsage getTarget() {
 		return (RenderingUsage)super.getTarget();
-	}
-	
-	/**
-	 * @satisfies checkRenderingUsageRedefinition
-	 */
-	@Override
-	public void addRedefinitions(Element skip) {
-		super.addRedefinitions(skip);
-		if (isViewRendering()) {
-			addImplicitGeneralType(SysMLPackage.eINSTANCE.getRedefinition(), getLibraryType(getDefaultSupertype("viewRendering")));
-		}
-	}
-	
-	/**
-	 * @satisfies checkRenderingUsageSubrenderingSpecialization
-	 * @satisfies checkRenderingUsageSpecialization
-	 */
-	@Override
-	protected String getDefaultSupertype() {
-		return isSubrendering()?
-					getDefaultSupertype("subrendering"):
-					getDefaultSupertype("base");
-	}
-	
-	public boolean isViewRendering() {
-		FeatureMembership membership = getTarget().getOwningFeatureMembership();
-		return membership instanceof ViewRenderingMembership;
-	}
-	
-	public boolean isSubrendering() {
-		Type owningType = getTarget().getOwningType();
-		return owningType instanceof RenderingDefinition | owningType instanceof RenderingUsage;
 	}
 	
 }

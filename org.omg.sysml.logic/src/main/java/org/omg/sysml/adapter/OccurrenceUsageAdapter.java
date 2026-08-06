@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021, 2023-2025 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -46,49 +47,4 @@ public class OccurrenceUsageAdapter extends UsageAdapter {
 		}
 	}
 	
-	// Implicit Generalization
-	
-	/**
-	 * @satisfies checkFeatureObjectSpecialization
-	 * @satisfies checkFeatureSubobjectSpecialization
-	 * @satisfies checkFeatureDataValueSpecialization
-	 * @satisfies checkOccurrenceUsageSnapshotSpecialization
-	 * @satisfies checkOccurrenceUsageSuboccurrenceSpecialization
-	 * @satisfies checkOccurrenceUsageTimeSliceSpecialization
-	 */
-	@Override
-	public void addDefaultGeneralType() {
-		super.addDefaultGeneralType();
-		if (hasDataType()) {
-			addDefaultGeneralType("dataValue");
-		}
-		if (hasStructureType()) {
-			addDefaultGeneralType(isSubobject()? "subobject": "object");
-		}
-		else if (isSuboccurrence()) {
-			addDefaultGeneralType("suboccurrence");
-		}
-		PortionKind portionKind = getTarget().getPortionKind();
-		if (portionKind  == PortionKind.SNAPSHOT) {
-			addDefaultGeneralType("snapshot");
-		} else if (portionKind == PortionKind.TIMESLICE) {
-			addDefaultGeneralType("timeslice");
-		}
-	}
-	
-	@Override
-	protected boolean isSuboccurrence() {
-		OccurrenceUsage target = getTarget();
-		return super.isSuboccurrence() ||
-				target.isComposite() && 
-			   	target.getOwningType() instanceof OccurrenceUsage;
-	}
-	
-	/**
-	 * @satisfies checkOccurrenceUsageSpecialization
-	 */
-	@Override
-	protected String getDefaultSupertype() {
-		return getDefaultSupertype("base");
-	}
 }

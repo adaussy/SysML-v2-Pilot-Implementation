@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021, 2022, 2025 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -34,28 +35,4 @@ public class StepAdapter extends FeatureAdapter {
 		return (Step)super.getTarget();
 	}
 	
-	/**
-	 * @satisfies checkStepOwnedPerformanceSpecialization
-	 * @satisfies checkStepSubperformanceSpecialization
-	 * @satisfies checkStepEnclosedPerformanceSpecialization
-	 * @satisfies checkStepSpecialization
-	 */
-	@Override
-	protected String getDefaultSupertype() {
-		return getDefaultSupertype(
-			isStructureOwnedComposite()?
-				"ownedPerformance":
-			isBehaviorOwnedComposite()?
-				"subperformance":
-			isBehaviorOwned()? 
-				"enclosedPerformance":
-			isIncomingTransfer()?
-				"incomingTransfer":
-				"base");
-	}
-	
-	public boolean isIncomingTransfer() {
-		return getTarget().getOwnedFeature().stream().anyMatch(PayloadFeature.class::isInstance);
-	}
-
 }

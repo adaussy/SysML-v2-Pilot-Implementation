@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2022, 2025 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -40,19 +41,6 @@ public class TriggerInvocationExpressionAdapter extends InvocationExpressionAdap
 	public TriggerInvocationExpression getTarget() {
 		return (TriggerInvocationExpression)super.getTarget();
 	}
-	
-	@Override
-	public void computeImplicitGeneralTypes() {
-		//checkTriggerInvocationExpressionSpecialization
-		TriggerInvocationExpression target = getTarget();
-		TriggerKind kind = target.getKind();
-		if (kind != null) {
-			addDefaultGeneralType(SysMLPackage.eINSTANCE.getFeatureTyping(), 
-					ImplicitGeneralizationMap.getDefaultSupertypeFor(target.getClass(), kind.toString()));
-		}
-		super.computeImplicitGeneralTypes();
-	}
-	
 	
 	/**
 	 * @satisfies checkAcceptActionUsageReceiverBindingConnector

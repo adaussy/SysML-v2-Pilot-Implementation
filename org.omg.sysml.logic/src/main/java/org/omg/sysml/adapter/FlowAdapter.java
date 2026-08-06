@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021, 2022, 2025 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -34,39 +35,6 @@ public class FlowAdapter extends ConnectorAdapter {
 		return (Flow)super.getTarget();
 	}
 	
-	/**
-	 * @satisfies checkStepOwnedPerformanceSpecialization
-	 * @satisfies checkStepSubperformanceSpecialization
-	 * @satisfies checkStepEnclosedPerformanceSpecialization
-	 */
-	@Override
-	public void addDefaultGeneralType() {
-		super.addDefaultGeneralType();
-		if (isStructureOwnedComposite()) {
-			addDefaultGeneralType("ownedPerformance");
-		}
-		if (isBehaviorOwnedComposite()) {
-			addDefaultGeneralType("subperformance");
-		}
-		if (isBehaviorOwned()) {
-			addDefaultGeneralType("enclosedPerformance");
-		}
-	}
-
-	/**
-	 * @satisfies checkFlowSpecialization
-	 * @satisfies checkFlowWithEndsSpecialization
-	 */
-	@Override
-	protected String getDefaultSupertype() {
-		return isFlowTransfer()? getDefaultSupertype("flow"):
-			   getDefaultSupertype("base");
-	}
-	
-	protected boolean isFlowTransfer() {
-		return !getTarget().getOwnedEndFeature().isEmpty();
-	}
-		
 	@Override
 	public void doTransform() {
 		ConnectorUtil.transformConnectorEndsOf(getTarget());

@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021, 2022, 2025, 2026 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -38,25 +39,6 @@ public class IncludeUseCaseUsageAdapter extends UseCaseUsageAdapter {
 		return (IncludeUseCaseUsage)super.getTarget();
 	}
 	
-	/**
-	 * @satisfies checkIncludeUseCaseUsageSpecialization
-	 */
-	public boolean isSubUseCase() {
-		Type owningType = getTarget().getOwningType();
-		return owningType instanceof UseCaseDefinition || owningType instanceof UseCaseUsage;
-	}
-	
-	/**
-	 * @satisfies checkPerformActionUsageSpecialization
-	 */
-	@Override
-	public void addDefaultGeneralType() {
-		super.addDefaultGeneralType();
-		if (isPerformedAction()) {
-			addDefaultGeneralType("performedAction");
-		}
-	}
-		
 	@Override
 	public boolean hasRelevantSubjectParameter() {
 		Type owningType = getTarget().getOwningType();

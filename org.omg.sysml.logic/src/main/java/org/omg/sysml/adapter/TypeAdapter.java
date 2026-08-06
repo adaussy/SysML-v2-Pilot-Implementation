@@ -1,6 +1,7 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
  * Copyright (c) 2021-2026 Model Driven Solutions, Inc.
+ * Copyright (c) 2026 Obeo
  *    
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Eclipse Public License as published by
@@ -23,11 +24,8 @@ package org.omg.sysml.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -37,16 +35,13 @@ import java.util.stream.Stream;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.omg.sysml.lang.sysml.MetadataFeature;
 import org.omg.sysml.lang.sysml.Namespace;
-import org.omg.sysml.lang.sysml.Redefinition;
 import org.omg.sysml.lang.sysml.BindingConnector;
 import org.omg.sysml.lang.sysml.Conjugation;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.Expression;
 import org.omg.sysml.lang.sysml.Feature;
 import org.omg.sysml.lang.sysml.FeatureMembership;
-import org.omg.sysml.lang.sysml.Specialization;
 import org.omg.sysml.lang.sysml.Membership;
 import org.omg.sysml.lang.sysml.ResultExpressionMembership;
 import org.omg.sysml.lang.sysml.SysMLPackage;
@@ -57,7 +52,6 @@ import org.omg.sysml.util.ConnectorUtil;
 import org.omg.sysml.util.ElementUtil;
 import org.omg.sysml.util.EvaluationUtil;
 import org.omg.sysml.util.FeatureUtil;
-import org.omg.sysml.util.ImplicitGeneralizationMap;
 import org.omg.sysml.util.NonNotifyingEObjectEList;
 import org.omg.sysml.util.TypeUtil;
 
@@ -238,47 +232,19 @@ public class TypeAdapter extends NamespaceAdapter {
 	
 	// Implicit Elements
 	
-	protected boolean isAddImplicitGeneralTypes = true;
-	
-	public void setIsAddImplicitGeneralTypes(boolean isAddImplicitGeneralTypes) {
-		this.isAddImplicitGeneralTypes = isAddImplicitGeneralTypes;
-	}
-	
 	/**
 	 * Contains the required ends for implicit specializations like implicit
 	 * superclassing, subsetting, featuretyping and redefinitions for future access.
 	 * The lists must not contain null values and the current type.
 	 */
-	protected Map<EClass, List<Type>> implicitGeneralTypes = new HashMap<>();
 	protected List<BindingConnector> implicitMemberBindingConnectors = new ArrayList<>();
 	protected List<BindingConnector> implicitFeatureBindingConnectors = new ArrayList<>();
-	
-	public void cleanImplicitGeneralTypes() {
-		implicitGeneralTypes.clear();
-	}
 	
 	public void cleanImplicitBindingConnectors() {
 		implicitMemberBindingConnectors.clear();
 		implicitFeatureBindingConnectors.clear();
 	}
 
-	public boolean isImplicitGeneralTypesEmpty() {
-		return implicitGeneralTypes.isEmpty();
-	}
-	
-	public Collection<EClass> getImplicitGeneralTypeKinds() {
-		// Sort keys, to ensure a deterministic ordering of implied specializations 
-		// for implicit general types.
-		List<EClass> keyList = new ArrayList<>(implicitGeneralTypes.keySet());
-		Collections.sort(keyList, new Comparator<EClass>() {
-			@Override
-			public int compare(EClass c1, EClass c2) {
-				return Integer.compare(c1.getClassifierID(), c2.getClassifierID());
-			}			
-		});
-		return keyList;
-	}
-	
 	public void forEachImplicitBindingConnector(Consumer<BindingConnector> consumer) {
 		Stream.concat(implicitMemberBindingConnectors.stream(), implicitFeatureBindingConnectors.stream())
 				.forEach(consumer);
@@ -297,64 +263,6 @@ public class TypeAdapter extends NamespaceAdapter {
 		}
 	}
 	
-	public List<Type> getImplicitGeneralTypes() {
-		computeImplicitGeneralTypes();
-		
-		return getImplicitGeneralTypeKinds().stream().
-				map(implicitGeneralTypes::get).
-				flatMap(Collection::stream).
-				collect(Collectors.toList());
-	}
-	
-	public List<Type> getImplicitGeneralTypes(EClass eClass) {
-		return getImplicitGeneralTypeKinds().stream().
-				filter(eClass::isSuperTypeOf).
-				flatMap(keyClass->getImplicitGeneralTypesOnly(keyClass).stream()).
-				collect(Collectors.toList());
-	}
-	
-	public List<Type> getImplicitGeneralTypesOnly(EClass eClass) {
-		return implicitGeneralTypes.getOrDefault(eClass, Collections.emptyList());
-	}
-	
-	public Type getFirstImplicitGeneralType(EClass eClass) {
-		List<Type> types = getImplicitGeneralTypes(eClass);
-		return types.isEmpty() ? null : types.get(0);
-	}
-	
-	public boolean isImplicitSpecializationDeclaredFor(EClass eClass) {
-		return implicitGeneralTypes.containsKey(eClass);
-	}
-	
-	public boolean isImplicitSpecializationFor(EClass eClass, Type general) {
-		return implicitGeneralTypes.getOrDefault(eClass, Collections.emptyList()).contains(general);
-	}
-	
-	protected static boolean hasNoConformingSpecializations(Type type, Class<?> kind, Type defaultGeneral) {
-		return type.getOwnedRelationship().stream().
-				filter(kind::isInstance).
-				map(Specialization.class::cast).
-				noneMatch(spec->spec.getSpecific() == type && TypeUtil.specializes(defaultGeneral, spec.getGeneral()));
-	}
-
-	public void addImplicitGeneralType(EClass eClass, Type general) {
-		if (isAddImplicitGeneralTypes && general != null && general != getTarget() && !isImplicitSpecializationFor(eClass, general)) {
-			implicitGeneralTypes.computeIfAbsent(eClass, e -> new ArrayList<>()).add(general);
-		}
-	}
-	
-	public void removeImplicitGeneralType(EClass eClass) {
-		implicitGeneralTypes.remove(eClass);
-	}
-	
-	public void forEachImplicitGeneralType(BiConsumer<EClass, Type> action) {
-		for (EClass eClass : getImplicitGeneralTypeKinds()) {
-			for (Type supertype : implicitGeneralTypes.get(eClass)) {
-				action.accept(eClass, supertype);
-			}
-		}
-	}	
-
 	public void addImplicitFeatureBindingConnector(BindingConnector connector) {
 		implicitFeatureBindingConnectors.add(connector);
 	}
@@ -363,127 +271,8 @@ public class TypeAdapter extends NamespaceAdapter {
 		implicitMemberBindingConnectors.add(connector);
 	}
 	
-	public void removeUnnecessaryImplicitGeneralTypes() {
-		Type target = getTarget();
-		List<Specialization> specializations = target.getOwnedSpecialization().stream().
-				filter(spec->spec.getSpecific() == target && spec.getGeneral() != target).
-				collect(Collectors.toList());
-		List<Type> generals = specializations.stream().
-				map(Specialization::getGeneral).
-				collect(Collectors.toList());
-		List<Type> redefinedFeatures = specializations.stream().
-				filter(Redefinition.class::isInstance).
-				map(Specialization::getGeneral).
-				collect(Collectors.toList());
-		List<Type> implicitGenerals = new ArrayList<>();
-		implicitGeneralTypes.values().forEach(implicitGenerals::addAll);
-		for (Object eClass: implicitGeneralTypes.keySet().toArray()) {
-			List<Type> implicitEClassGenerals = implicitGeneralTypes.get(eClass);
-			if (implicitEClassGenerals != null) {
-				if (eClass == SysMLPackage.eINSTANCE.getRedefinition()) {
-					implicitEClassGenerals.removeAll(redefinedFeatures);
-				} else {
-					implicitEClassGenerals.removeIf(gen->
-						generals.stream().anyMatch(type->specializesExcludingTarget(type, gen)) ||
-						implicitGenerals.stream().anyMatch(type->type != gen && specializesExcludingTarget(type, gen)));
-				}
-				if (implicitEClassGenerals.isEmpty()) {
-					implicitGeneralTypes.remove(eClass);
-				}
-			}
-		}
-		
-		// Disallow adding more implicit general types once unnecessary ones have been removed.
-		setIsAddImplicitGeneralTypes(false);
-	}
-	
-	protected boolean specializesExcludingTarget(Type subtype, Type supertype) {
-		// NOTE: Treat target as already having been visited when checking conformance,
-		// to allow for the possibility of circular specialization. Otherwise, implicit
-		// specializations would get removed from all types in the circle.
-		Set<Type> visited = new HashSet<>();
-		visited.add(getTarget());
-		return TypeUtil.specializes(subtype, supertype, visited);
-	}
-	
-	// Implicit Specialization Computation
-	
-	boolean isComputeImplicitGeneralTypes = true;
-	
-	public void computeImplicitGeneralTypes() {
-		if (isComputeImplicitGeneralTypes && !getTarget().isConjugated()) {
-			addDefaultGeneralType();
-			isComputeImplicitGeneralTypes = false;
- 		}
-	}
-	
-	/**
-	 * @satisfies checkMetadataFeatureSemanticSpecialization
-	 */
-	public void addDefaultGeneralType() {
-		for (Type baseType: getBaseTypes()) {
-			addImplicitGeneralType(getSpecializationEClass(), baseType);
-		}
-		addDefaultGeneralType(getSpecializationEClass(), getDefaultSupertype());
-	}
-	
-	public void addDefaultGeneralType(String kind) {
-		addDefaultGeneralType(getSpecializationEClass(), getDefaultSupertype(kind));
-	}
-	
-	public void addDefaultGeneralType(EClass generalizationEClass, String... superTypeNames) {
-		addImplicitGeneralType(generalizationEClass, getLibraryType(superTypeNames));
-	}
-	
-	protected EClass getSpecializationEClass() {
-		return SysMLPackage.eINSTANCE.getSpecialization();
-	}
-	
-	protected String getDefaultSupertype() {
-		return getDefaultSupertype("base");
-	}
-	
-	protected String getDefaultSupertype(String kind) {
-		return ImplicitGeneralizationMap.getDefaultSupertypeFor(getTarget().getClass(), kind);
-	}
-	
 	public Type getLibraryType(String... defaultNames) {
 		return SysMLLibraryUtil.getLibraryType(getTarget(), defaultNames);
-	}
-	
-	// Extension
-	
-	private boolean isGetBaseTypes = true;
-	
-	protected List<Type> getBaseTypes() {
-		List<Type> baseTypes = new ArrayList<>();
-		if (isGetBaseTypes) {
-			Type target = getTarget();
-			for (MetadataFeature metadataFeature : ElementUtil.getAllMetadataFeaturesOf(target)) {
-				// Resolve metaclass proxy before getting base type, to avoid problems
-				// with name resolution when applying semantic metadata.
-				metadataFeature.getMetaclass();
-				isGetBaseTypes = false;
-				metadataFeature.getFeature().stream().
-						filter(f->TypeUtil.specializes(f, getBaseTypeFeature(metadataFeature))).
-						map(FeatureUtil::getValueExpressionFor).
-						filter(expr->expr != null).
-						map(expr->expr.evaluate(metadataFeature)).
-						filter(results->results != null && !results.isEmpty()).
-						map(results->results.get(0)).
-						map(EvaluationUtil::getMetaclassReferenceOf).
-						filter(Type.class::isInstance).
-						map(Type.class::cast).
-						forEachOrdered(baseTypes::add);
-				isGetBaseTypes = true;
-			}
-		}
-		return baseTypes;
-	}
-	
-	protected static Feature getBaseTypeFeature(Element element) {
-		return (Feature)SysMLLibraryUtil.getLibraryType(element, 
-				ImplicitGeneralizationMap.getDefaultSupertypeFor(element.getClass(), "baseType"));
 	}
 	
 	// Transformation
@@ -517,12 +306,5 @@ public class TypeAdapter extends NamespaceAdapter {
 			addResultBinding(resultExpression, result);
 		}
 	}
-	
-	@Override
-	public void doTransform() {
-		super.doTransform();
-		computeImplicitGeneralTypes();
-		removeUnnecessaryImplicitGeneralTypes();
-	}
-	
+
 }

@@ -1,6 +1,7 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
  * Copyright (c) 2021-2025 Model Driven Solutions, Inc.
+ * Copyright (c) 2026 Obeo
  *    
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Eclipse Public License as published by
@@ -343,7 +344,7 @@ public class FeatureUtil {
 				featuring.setIsImplied(true);
 				featuring.setFeaturingType(type);
 				featuring.setFeatureOfType(feature);
-				if (type.getOwningRelationship() == null) {
+				if (type.getOwningRelationship() == null && type.eResource() == null) {
 					featuring.getOwnedRelatedElement().add(type);
 				}
 				feature.getOwnedRelationship().add(featuring);

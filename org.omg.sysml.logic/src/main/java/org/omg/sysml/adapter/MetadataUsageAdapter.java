@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2022, 2025 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -35,9 +36,4 @@ public class MetadataUsageAdapter extends ItemUsageAdapter {
 	/**
 	 * @satisfies checkMetadataUsageSpecialization
 	 */
-	@Override
-	protected String getDefaultSupertype() {
-		return getDefaultSupertype("base");
-	}
-	
 }

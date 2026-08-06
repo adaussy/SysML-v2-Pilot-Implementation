@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021-2025, 2026 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -124,41 +125,6 @@ public class UsageAdapter extends FeatureAdapter {
 		}
 	}
 		
-	// Implicit Generalization
-	
-	protected void addSubsetting(String subsettedFeatureName) {
-		Feature feature = (Feature)getLibraryType(subsettedFeatureName);
-		if (feature != null) {
-			addImplicitGeneralType(SysMLPackage.eINSTANCE.getSubsetting(), feature);
-		}
-	}
-	
-	/**
-	 * @satisfies checkUsageVariationDefinitionSpecialization
-	 * @satisfies checkUsageVariationUsageSpecialization
-	 */
-	protected void addVariationTyping() {
-		Usage usage = getTarget();
-		if (UsageUtil.isVariant(usage)) {
-			Definition variationDefinition = UsageUtil.getOwningVariationDefinitionFor(usage);
-			if (variationDefinition != null) {
-				addImplicitGeneralType(SysMLPackage.eINSTANCE.getFeatureTyping(), variationDefinition);
-			} else {
-				Usage variationUsage = UsageUtil.getOwningVariationUsageFor(usage);
-				if (variationUsage != null) {
-					addImplicitGeneralType(SysMLPackage.eINSTANCE.getSubsetting(), variationUsage);
-				}
-			}
-		}
-	}
-	
-	@Override
-	public void addDefaultGeneralType() {
-		addVariationTyping();
-		
-		super.addDefaultGeneralType();
-	}
-	
 	// Transformation
 	
 	// Used to check for default multiplicity for AttributeUsages, ItemUsages and PortUsages.

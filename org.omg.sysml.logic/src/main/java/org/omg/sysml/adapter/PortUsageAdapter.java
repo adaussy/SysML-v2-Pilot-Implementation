@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021, 2022, 2025, 2026 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -48,42 +49,6 @@ public class PortUsageAdapter extends UsageAdapter {
 		if (!(featuringType instanceof PortDefinition || featuringType instanceof PortUsage)) {
 			target.setIsComposite(false);
 		}
-	}
-	
-	// Implicit Generalization
-	
-	@Override
-	public void addDefaultGeneralType() {
-		super.addDefaultGeneralType();
-		if (isStructureOwnedComposite()) {
-			addDefaultGeneralType("subobject");
-		}
-	}
-	
-	/**
-	 * @satisfies checkPortUsageOwnedPortSpecialization
-	 * @satisfies checkPortUsageSubportSpecialization
-	 * @satisfies checkPortUsageSpecialization
-	 */
-	@Override
-	protected String getDefaultSupertype() {
-		return isOwnedPort()?
-					getDefaultSupertype("ownedPort"):
-			   isSubport()?
-					getDefaultSupertype("subport"):
-					getDefaultSupertype("base");
-	}
-	
-	public boolean isOwnedPort() {
-		PortUsage target = getTarget();
-		Type owningType = target.getOwningType();
-		return owningType instanceof PartDefinition || owningType instanceof PartUsage;		
-	}
-	
-	public boolean isSubport() {
-		PortUsage target = getTarget();
-		Type owningType = target.getOwningType();
-		return target.isComposite() && (owningType instanceof PortDefinition || owningType instanceof PortUsage);
 	}
 	
 	// Transformation

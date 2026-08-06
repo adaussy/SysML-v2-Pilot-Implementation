@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2024 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -32,17 +33,6 @@ public class TerminateActionUsageAdapter extends ActionUsageAdapter {
 	@Override
 	public TerminateActionUsage getTarget() {
 		return (TerminateActionUsage)super.getTarget();
-	}
-
-	@Override
-	public void computeImplicitGeneralTypes() {
-		addComputedRedefinitions(null);
-	}
-	
-	@Override
-	public void addComputedRedefinitions(Element skip) {
-		addDefaultGeneralType();
-		super.addComputedRedefinitions(skip);
 	}
 
 }

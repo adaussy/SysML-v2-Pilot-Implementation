@@ -1,6 +1,7 @@
 /**
  * SysML 2 Pilot Implementation
  * Copyright (C) 2025  Model Driven Solutions, Inc.
+ * Copyright (C) 2026 Obeo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Eclipse Public License as published by
@@ -19,6 +20,7 @@
 package org.omg.sysml.xtext.xmi
 
 import com.google.inject.Binder
+import com.google.inject.Singleton
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
 import org.eclipse.xtext.naming.IQualifiedNameConverter
@@ -30,7 +32,12 @@ import org.eclipse.xtext.resource.impl.ResourceSetBasedResourceDescriptions
 import org.omg.kerml.xtext.naming.KerMLQualifiedNameConverter
 import org.omg.kerml.xtext.naming.KerMLQualifiedNameProvider
 import org.omg.sysml.logic.api.IModelLibraryProvider
+import org.omg.sysml.logic.api.IImplicitSpecializationService
+import org.omg.sysml.logic.ImplicitSpecializationService
+import org.omg.sysml.lang.sysml.Type
+import org.omg.sysml.adapter.ImplicitSpecializationCacheAdapter
 import org.omg.sysml.util.SysMLLibraryUtil
+import org.omg.sysml.util.ImplicitSpecializationUtil
 import org.omg.sysml.xtext.library.SysMLLibraryProvider
 
 class SysMLxRuntimeModule extends AbstractGenericResourceRuntimeModule {
@@ -54,6 +61,12 @@ class SysMLxRuntimeModule extends AbstractGenericResourceRuntimeModule {
 					System.out.println("[SysMLLibraryUtil] Cannot get library provider: " + e)
 					null
 				}
+		])
+		ImplicitSpecializationUtil.setProviderLookup([
+			Type type |
+				ImplicitSpecializationCacheAdapter.installOn(type)
+				val serviceProvider = IResourceServiceProvider.Registry.INSTANCE.getResourceServiceProvider(type?.eResource?.URI)
+				if (serviceProvider === null) null else serviceProvider.get(IImplicitSpecializationService)
 		])
 	}
 	
@@ -84,5 +97,9 @@ class SysMLxRuntimeModule extends AbstractGenericResourceRuntimeModule {
 	
 	def Class<? extends IModelLibraryProvider> bindIModelLLibraryProvider() {
 		SysMLLibraryProvider
+	}
+
+	def void configureImplicitSpecializationService(Binder binder) {
+		binder.bind(IImplicitSpecializationService).to(ImplicitSpecializationService).in(Singleton)
 	}
 }

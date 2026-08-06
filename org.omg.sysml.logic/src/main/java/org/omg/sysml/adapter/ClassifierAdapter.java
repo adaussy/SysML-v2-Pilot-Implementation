@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021-2022 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -41,19 +42,4 @@ public class ClassifierAdapter extends TypeAdapter {
 		return (Classifier)super.getTarget();
 	}
 
-	@Override
-	protected EClass getSpecializationEClass() {
-		return SysMLPackage.eINSTANCE.getSubclassification();
-	}
-	
-	@Override
-	protected List<Type> getBaseTypes() {
-		return super.getBaseTypes().stream().
-				flatMap(type->type instanceof Feature? 
-						((Feature)type).getType().stream(): 
-						Stream.of(type)).
-				filter(Classifier.class::isInstance).
-				collect(Collectors.toList());
-	}
-	
 }

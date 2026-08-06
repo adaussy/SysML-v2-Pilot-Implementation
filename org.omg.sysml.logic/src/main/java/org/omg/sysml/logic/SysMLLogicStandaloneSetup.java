@@ -26,6 +26,8 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.omg.sysml.delegate.invocation.OperationInvocationDelegateFactory;
 import org.omg.sysml.delegate.setting.DerivedPropertySettingDelegateFactory;
 import org.omg.sysml.logic.api.IModelLibraryProvider;
+import org.omg.sysml.logic.api.IImplicitSpecializationService;
+import org.omg.sysml.util.ImplicitSpecializationUtil;
 import org.omg.sysml.util.SysMLLibraryUtil;
 
 /**
@@ -67,6 +69,17 @@ public final class SysMLLogicStandaloneSetup {
 	 *        elements in standalone mode
 	 */
 	public static void doSetup(IModelLibraryProvider libraryProvider) {
+		doSetup(libraryProvider, new ImplicitSpecializationService());
+	}
+
+	/**
+	 * Installs the standalone bootstrap with explicit runtime services.
+	 *
+	 * @param libraryProvider provider used for model-library lookup
+	 * @param implicitSpecializationService service used for implicit specializations
+	 */
+	public static void doSetup(IModelLibraryProvider libraryProvider,
+			IImplicitSpecializationService implicitSpecializationService) {
 		EStructuralFeature.Internal.SettingDelegate.Factory.Registry.INSTANCE.put(
 				DerivedPropertySettingDelegateFactory.SYSML_ANNOTATION,
 				new DerivedPropertySettingDelegateFactory());
@@ -74,5 +87,6 @@ public final class SysMLLogicStandaloneSetup {
 				OperationInvocationDelegateFactory.SYSML_ANNOTATION,
 				new OperationInvocationDelegateFactory());
 		SysMLLibraryUtil.setProviderLookup(resource -> libraryProvider);
+		ImplicitSpecializationUtil.setProviderLookup(type -> implicitSpecializationService);
 	}
 }

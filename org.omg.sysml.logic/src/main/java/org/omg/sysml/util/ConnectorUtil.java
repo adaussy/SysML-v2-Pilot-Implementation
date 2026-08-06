@@ -2,6 +2,7 @@
  * SysML 2 Pilot Implementation
  * Copyright (c) 2021-2022 Model Driven Solutions, Inc.
  * Copyright (c) 2023 Mgnite Inc.
+ * Copyright (c) 2026 Obeo
  *    
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Eclipse Public License as published by
@@ -34,7 +35,6 @@ import org.omg.sysml.lang.sysml.Flow;
 import org.omg.sysml.lang.sysml.Namespace;
 import org.omg.sysml.lang.sysml.ReferenceSubsetting;
 import org.omg.sysml.lang.sysml.SysMLFactory;
-import org.omg.sysml.lang.sysml.SysMLPackage;
 import org.omg.sysml.lang.sysml.Type;
 
 public class ConnectorUtil {
@@ -53,8 +53,6 @@ public class ConnectorUtil {
 	}
 
 	public static void transformBindingConnector(BindingConnector connector, Type owner) {
-		TypeUtil.addImplicitGeneralTypeTo(connector, SysMLPackage.eINSTANCE.getSubsetting(), 
-				SysMLLibraryUtil.getLibraryType(owner, ImplicitGeneralizationMap.getDefaultSupertypeFor(connector.getClass(), "binary")));
 		for (Feature end: connector.getConnectorEnd()) {
 			ElementUtil.transform(end);
 		}
@@ -87,9 +85,6 @@ public class ConnectorUtil {
 				EList<Feature> endFeatures = ends.get(1).getOwnedFeature();
 				if (!endFeatures.isEmpty()) {
 					Feature flowEndFeature = endFeatures.get(0);
-					if (flowEndFeature.getOwnedRedefinition().isEmpty()) {
-						TypeUtil.addImplicitGeneralTypeTo(flowEndFeature, SysMLPackage.eINSTANCE.getRedefinition(), (Feature)owner);
-					}
 				}
 			}
 		}

@@ -1,5 +1,6 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
+ * Copyright (c) 2026 Obeo
  * Copyright (c) 2021-2024 Model Driven Solutions, Inc.
  *    
  * This program is free software: you can redistribute it and/or modify
@@ -33,19 +34,6 @@ public class OperatorExpressionAdapter extends InvocationExpressionAdapter {
 	@Override
 	public OperatorExpression getTarget() {
 		return (OperatorExpression)super.getTarget();
-	}
-	
-	/**
-	 * @satisfies checkOperatorExpressionSpecialization
-	 */
-	@Override
-	public void computeImplicitGeneralTypes() {
-		OperatorExpression target = getTarget();
-		String operator = target.getOperator();
-		if (operator != null) {
-			addDefaultGeneralType(SysMLPackage.eINSTANCE.getFeatureTyping(), ExpressionUtil.getOperatorQualifiedNames(operator));
-		}
-		super.computeImplicitGeneralTypes();
 	}
 	
 }

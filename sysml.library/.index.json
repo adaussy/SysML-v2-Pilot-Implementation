@@ -13040,6 +13040,7 @@
       "predecessors",
       "runToCompletionScope",
       "sameLifeOccurrences",
+      "self",
       "snapshotOf",
       "snapshots",
       "spaceBoundary",
@@ -202723,18 +202724,10 @@
       "withoutOccurrences"
     ],
     "States::StateAction::entryAction": [
-      "acceptSubactions",
-      "assignments",
-      "controls",
-      "decisionTransitions",
-      "decisions",
       "differencesOf",
       "dispatchScope",
-      "done",
       "enclosedPerformances",
-      "forLoops",
-      "forks",
-      "ifSubactions",
+      "endShot",
       "immediatePredecessors",
       "immediateSuccessors",
       "incomingTransferSort",
@@ -202747,13 +202740,10 @@
       "isClosed",
       "isDispatch",
       "isRunToCompletion",
-      "joins",
       "justOutsideOfOccurrences",
       "localClock",
       "longerOccurrence",
-      "loops",
       "matingOccurrences",
-      "merges",
       "middleTimeSlice",
       "outerSpaceDimension",
       "outgoingTransfers",
@@ -202767,7 +202757,6 @@
       "runToCompletionScope",
       "sameLifeOccurrences",
       "self",
-      "sendSubactions",
       "shorterOccurrence",
       "snapshotOf",
       "snapshots",
@@ -202783,14 +202772,12 @@
       "spaceTimeCoincidentOccurrences",
       "spaceTimeEnclosedOccurrences",
       "spaceTimeEnclosedPoints",
-      "start",
-      "subactions",
+      "startShot",
       "suboccurrences",
       "subperformances",
       "successors",
       "superoccurrence",
       "surroundedByOccurrences",
-      "terminateSubactions",
       "that",
       "this",
       "thisPerformance",
@@ -202798,9 +202785,7 @@
       "timeEnclosedOccurrences",
       "timeSliceOf",
       "timeSlices",
-      "transitions",
       "unionsOf",
-      "whileLoops",
       "withoutOccurrences"
     ],
     "States::StateAction::exclusiveStates": [
@@ -280191,5 +280176,5 @@
       "withoutOccurrences"
     ]
   },
-  "checksum": "e69c541524fc1effc91c174657bf78869a7064934d7a70994d63fd364f44d6ae"
+  "checksum": "384a8078065f707e8f467fbfa7cf45467bbb82dea8d1c403e963b643dae77ad5"
 }

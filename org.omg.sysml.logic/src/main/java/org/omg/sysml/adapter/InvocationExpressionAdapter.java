@@ -1,6 +1,7 @@
 /*******************************************************************************
  * SysML 2 Pilot Implementation
  * Copyright (c) 2021-2026 Model Driven Solutions, Inc.
+ * Copyright (c) 2026 Obeo
  *    
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Eclipse Public License as published by
@@ -63,23 +64,6 @@ public class InvocationExpressionAdapter extends InstantiationExpressionAdapter 
 		return operand;
 	}
 	
-	// Implicit generalization
-	
-	@Override
-	public void addDefaultGeneralType() {
-		super.addDefaultGeneralType();
-		
-		// checkInvocationExpressionSpecialization
-		Type instantiatedType = getTarget().getInstantiatedType();
-		if (instantiatedType != null) {
-			if (instantiatedType instanceof Feature) {
-				addImplicitGeneralType(SysMLPackage.eINSTANCE.getSubsetting(), instantiatedType);
-			} else {
-				addImplicitGeneralType(SysMLPackage.eINSTANCE.getFeatureTyping(), instantiatedType);
-			}			
-		}
-	}
-	
 	// Transformation
 	
 	/**
@@ -96,24 +80,6 @@ public class InvocationExpressionAdapter extends InstantiationExpressionAdapter 
 		}		
 	}
 	
-	/**
-	 * @satisfies checkInvocationExpressionBehaviorResultSpecialization
-	 */
-	protected void addResultTyping() {
-		InvocationExpression target = getTarget();
-		Type instantiatedType = target.getInstantiatedType();
-		if (instantiatedType != null && !isFunctionType(instantiatedType)) {
-			Feature result = TypeUtil.getOwnedResultParameterOf(target);
-			if (result != null) {
-				if (instantiatedType instanceof Feature) {
-					TypeUtil.addImplicitGeneralTypeTo(result, SysMLPackage.eINSTANCE.getSubsetting(), instantiatedType);
-				} else {
-					TypeUtil.addImplicitGeneralTypeTo(result, SysMLPackage.eINSTANCE.getFeatureTyping(), instantiatedType);
-				}
-			}
-		}
-	}
-	
 	protected static boolean isFunctionType(Type type) {
 		return type instanceof Function ||
 			   type instanceof Feature && ((Feature)type).getType().stream().anyMatch(Function.class::isInstance);
@@ -128,7 +94,6 @@ public class InvocationExpressionAdapter extends InstantiationExpressionAdapter 
 	public void doTransform() {
 		super.doTransform();
 		createSelfResultConnector();
-		addResultTyping();
 	}
 	
 }

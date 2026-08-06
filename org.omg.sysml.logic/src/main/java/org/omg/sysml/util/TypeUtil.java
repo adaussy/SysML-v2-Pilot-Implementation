@@ -56,6 +56,8 @@ import org.omg.sysml.lang.sysml.ReturnParameterMembership;
 import org.omg.sysml.lang.sysml.SysMLFactory;
 import org.omg.sysml.lang.sysml.SysMLPackage;
 import org.omg.sysml.lang.sysml.Type;
+import org.omg.sysml.logic.api.IImplicitSpecializationService;
+import org.omg.sysml.logic.api.ImplicitSpecialization;
 
 public class TypeUtil {
 	
@@ -377,67 +379,48 @@ public class TypeUtil {
 	}
 	
 	// Implicit general types
-	
-	public static void setIsAddImplicitGeneralTypesFor(Type type, boolean isAddImplicitGeneralTypes) {
-		getTypeAdapter(type).setIsAddImplicitGeneralTypes(isAddImplicitGeneralTypes);
+
+	private static IImplicitSpecializationService getImplicitSpecializationService(Type type) {
+		return ImplicitSpecializationUtil.getService(type);
 	}
 	
 	public static boolean isImplicitSpecializationDeclaredFor(Type type, EClass eClass) {
-		return getTypeAdapter(type).isImplicitSpecializationDeclaredFor(eClass);
+		return !getImplicitSpecializationService(type).getImplicitSpecializations(type, eClass, false).isEmpty();
 	}
 	
 	public static boolean isImplicitGeneralTypesEmpty(Type type) {
-		return getTypeAdapter(type).isImplicitGeneralTypesEmpty();
+		return getImplicitSpecializationService(type).getImplicitSpecializations(type).isEmpty();
 	}
 	
 	public static List<Type> getImplicitGeneralTypesFor(Type type) {
-		return getTypeAdapter(type).getImplicitGeneralTypes();
+		return getImplicitSpecializationService(type).getImplicitSpecializations(type).stream().
+				map(ImplicitSpecialization::generalType).
+				toList();
 	}
 	
 	public static List<Type> getImplicitGeneralTypesFor(Type type, EClass kind) {
-		return getTypeAdapter(type).getImplicitGeneralTypes(kind);
+		return getImplicitSpecializationService(type).getImplicitSpecializations(type, kind, true).stream().
+				map(ImplicitSpecialization::generalType).
+				toList();
 	}
 	
 	public static List<Type> getImplicitGeneralTypesOnly(Type type, EClass kind) {
-		return getTypeAdapter(type).getImplicitGeneralTypesOnly(kind);
-	}
-	
-	public static void addDefaultGeneralTypeTo(Type type) {
-		getTypeAdapter(type).addDefaultGeneralType();
-	}
-	
-	public static void addDefaultGeneralTypeTo(Type type, EClass generalizationEClass, String... superTypeNames) {
-		getTypeAdapter(type).addDefaultGeneralType(generalizationEClass, superTypeNames);
-	}
-	
-	public static void addImplicitGeneralTypeTo(Type type, EClass kind, Type generalType) {
-		getTypeAdapter(type).addImplicitGeneralType(kind, generalType);
-	}
-	
-	public static void removeImplicitGeneralTypeFrom(Type type, EClass kind) {
-		getTypeAdapter(type).removeImplicitGeneralType(SysMLPackage.eINSTANCE.getRedefinition());
+		return getImplicitSpecializationService(type).getImplicitSpecializations(type, kind, false).stream().
+				map(ImplicitSpecialization::generalType).
+				toList();
 	}
 	
 	public static void forEachImplicitGeneralTypeOf(Type type, BiConsumer<EClass, Type> action) {
-		getTypeAdapter(type).forEachImplicitGeneralType(action);
+		getImplicitSpecializationService(type).getImplicitSpecializations(type).
+				forEach(specialization->action.accept(
+						specialization.specializationKind(), specialization.generalType()));
 	}
 
 	/**
 	 * Physically insert implicit specializations into the model.
 	 */
 	public static void insertImplicitSpecializations(Type type) {
-		TypeAdapter adapter = getTypeAdapter(type);
-		adapter.forEachImplicitGeneralType((eClass, general)->{
-			Specialization newSpecialization = (Specialization)SysMLFactory.eINSTANCE.create(eClass);
-			newSpecialization.setIsImplied(true);
-			newSpecialization.setGeneral(general);
-			newSpecialization.setSpecific(type);
-			if (general.getOwningRelationship() == null) {
-				newSpecialization.getOwnedRelatedElement().add(general);
-			}
-			type.getOwnedRelationship().add(newSpecialization);			
-		});
-		adapter.cleanImplicitGeneralTypes();
+		getImplicitSpecializationService(type).materialize(type);
 	}
 
 	// Implicit binding connectors

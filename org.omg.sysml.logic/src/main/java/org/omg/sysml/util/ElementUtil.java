@@ -2,6 +2,7 @@
  * SysML 2 Pilot Implementation
  * Copyright (c) 2019, 2020, 2022, 2024, 2025 Model Driven Solutions, Inc.
  * Copyright (c) 2023 Mgnite Inc.
+ * Copyright (c) 2026 Obeo
  *    
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Eclipse Public License as published by
@@ -35,6 +36,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.omg.sysml.adapter.ElementAdapter;
 import org.omg.sysml.adapter.ElementAdapterFactory;
+import org.omg.sysml.adapter.ImplicitSpecializationCacheAdapter;
 import org.omg.sysml.lang.sysml.MetadataFeature;
 import org.omg.sysml.lang.sysml.AnnotatingElement;
 import org.omg.sysml.lang.sysml.Annotation;
@@ -291,10 +293,16 @@ public class ElementUtil {
 	
 	public static void clean(Element element) {
 		ElementAdapterFactory.removeAdapter(element);
+		if (element instanceof Type type) {
+			ImplicitSpecializationCacheAdapter.removeFrom(type);
+		}
 	}
 	
 	public static void clearCachesOf(Element element) {
 		getElementAdapter(element).clearCaches();
+		if (element instanceof Type type) {
+			ImplicitSpecializationUtil.getService(type).invalidate(type);
+		}
 	}
 	
 	// Metaclass
@@ -361,11 +369,17 @@ public class ElementUtil {
 				transformAll(element, addImplicitElements);
 			}
 		}
-		if (addImplicitElements && root instanceof Type) {
-			root.setIsImpliedIncluded(true);
-			TypeUtil.insertImplicitBindingConnectors((Type)root);
-			TypeUtil.insertImplicitSpecializations((Type)root);
-			if (root instanceof Feature) {
+		if (root instanceof Type type) {
+			if (addImplicitElements) {
+				root.setIsImpliedIncluded(true);
+				TypeUtil.insertImplicitBindingConnectors(type);
+			}
+			if (addImplicitElements) {
+				ImplicitSpecializationUtil.getService(type).materialize(type);
+			} else {
+				ImplicitSpecializationUtil.getService(type).getImplicitSpecializations(type);
+			}
+			if (addImplicitElements && root instanceof Feature) {
 				FeatureUtil.insertImplicitTypeFeaturings((Feature)root);
 			}
 		}
